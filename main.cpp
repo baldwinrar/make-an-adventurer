@@ -8,55 +8,61 @@ struct Character {
 
     std::string name = "Unknown";
     std::string advclass = "Adventurer";
-    int stats[7] = {0};
-    int hp = 0;
+    int stats[8] = {0};
+    std::string hd = "NA";
+
 } adventurer;
 
-std::vector<std::string> statnames = {"Strength", "Intelligence", "Wisdom", "Constitution", "Dexterity", "Charisma", "Gold"};
-std::vector<std::string> advclassnames = {"Fighter", "Magic-user", "Cleric", "Barbarian", "Thief", "Bard"};
-
+std::vector<std::string> statnames = {"Strength", "Intelligence", "Wisdom", "Constitution", "Dexterity", "Charisma", "Gold", "HP"};
+std::vector<std::string> advclassnames = {"Cleric", "Dwarf", "Elf", "Fighter", "Halfling", "Magic-User", "Thief"};
 std::random_device rd{};    
 std::mt19937 tower{rd()};
 std::uniform_real_distribution<float> d4{1, 5};
 std::uniform_real_distribution<float> d6{1, 7};
+std::uniform_real_distribution<float> d8{1, 9};
+std::uniform_real_distribution<float> d10{1, 11};
+std::uniform_real_distribution<float> d12{1, 13};
+std::uniform_real_distribution<float> d20{1, 21};
 
-int roll_nd4 (int n) {
+int roll_ndx (int n, int x) {
 
     int sum = 0;
+    int roll = 0;
 
     for (int i=0; i<n; i++) {
 
-        int roll = d4(tower);
-
-        if (roll > 4) {
-
-            std::cout << "lol" << std::endl;
-            i--;
-
-        } else {
-
-            sum += roll;
+        switch (x) {
+            case 4:
+                roll = d4(tower);
+                break;
+            case 6:
+                roll = d6(tower);
+                break;
+            case 8:
+                roll = d8(tower);
+                break;
+            case 10:
+                roll = d10(tower);
+                break;
+            case 12:
+                roll = d12(tower);
+                break;
         }
-    }
 
-    return sum;
-}
+        // Error!
+        if (roll == 0) {
 
-int roll_nd6 (int n) {
+            sum = -1;
+            break;
+        }
 
-    int sum = 0;
+        if (roll > x) {
 
-    for (int i=0; i<n; i++) {
-
-        int roll = d6(tower);
-
-        if (roll > 6) {
             std::cout << "lol" << std::endl;
             i--;
 
         } else {
 
-            // std::cout << " " << roll << " ";
             sum += roll;
         }
     }
@@ -116,16 +122,19 @@ void showStats(int *statarr, bool showbonus = false, bool shownum = false) {
 
         std::cout << "Strength: " << StatQuality(statarr[0]) << "\t" << "Intelligence: " << StatQuality(statarr[1]) << "\t" << "Wisdom: " << StatQuality(statarr[2])<< std::endl;
         std::cout << "Constitution: " << StatQuality(statarr[3]) << "\t" << "Dexterity: " << StatQuality(statarr[4]) << "\t" << "Charisma: " << StatQuality(statarr[5]) << std::endl;
+        std::cout << "HP: " << statarr[6] << "\t\t\t" << "Gold: " << statarr[7] << std::endl;
 
     } else if (shownum) {
 
         std::cout << "1. Strength: " << statarr[0] << "\t\t" << "2. Intelligence: " << statarr[1] << "\t" << "3. Wisdom: " << statarr[2]<< std::endl;
         std::cout << "4. Constitution: " << statarr[3] << "\t" << "5. Dexterity: " << statarr[4] << sorbGap(statarr[4]) << "6. Charisma: " << statarr[5] << std::endl;
+        std::cout << "7. HP: " << statarr[6] << "\t\t\t" << "8. Gold: " << statarr[7] << std::endl;
 
     } else {
 
         std::cout << "Strength: " << statarr[0] << "\t\t" << "Intelligence: " << statarr[1] << sorbGap(statarr[1])  << "Wisdom: " << statarr[2] << std::endl;
         std::cout << "Constitution: " << statarr[3] << sorbGap(statarr[3]) << "Dexterity: " << statarr[4] << "\t\t"  << "Charisma: " << statarr[5] << std::endl;
+        std::cout << "HP: " << statarr[6] << "\t\t\t" << "Gold: " << statarr[7] << std::endl;
     }
 }
 
@@ -134,7 +143,6 @@ void showSheet() {
     std::cout << std::endl;
     std::cout << "\t\t" << adventurer.name << ", the " << adventurer.advclass << std::endl;
     showStats(adventurer.stats);
-    std::cout << "Gold: " << adventurer.stats[6] << std::endl;
     std::cout << std::endl;
 }
 
@@ -145,6 +153,8 @@ int main() {
     
     /* Main menu loop */
     while (run) {
+
+        // TODO: Add character saving
 
         showSheet();
         std::cout << "Please select an option:" << std::endl;
@@ -167,6 +177,8 @@ int main() {
 
         /* Class selection */
         } else if (choice == 2) {
+
+            // TODO: Flesh out classes and their respective HD
 
             bool select = true;
 
@@ -200,50 +212,41 @@ int main() {
         /* Stat rollup and modification */
         } else if (choice == 3) {
 
-            bool rolling = true;
-            int newstats[7];
+            // TODO: Add option to reroll a specific stat, including gold and hp
+            
+            int newstats[8];
 
-            for (int i=0; i<7; i++) {
+            for (int i=0; i<8; i++) {
                 
                 newstats[i] = adventurer.stats[i];
             }
 
             bool bonuses = false;
-            bool modified = false;
-            while (rolling) {
+            bool statting = true;
+
+            while (statting) {
 
                 /* Submenu */
-
-                if (modified) {
-
-                    std::cout << "\nYour (modified) stat sheet" << std::endl;
-
-                } else {
-
-                    std::cout << "\nYour stat sheet" << std::endl;
-                }
-                
+                std::cout << "\nYour stat sheet" << std::endl;  
                 showStats(newstats, bonuses);
                 bonuses = false;
-                std::cout << "Gold: " << newstats[6] << std::endl << std::endl;
-                std::cout << "Select an option: \n1. (Re)Roll \n2. Edit \n3. Save \n4. Cancel" << std::endl;
+                std::cout << "\nSelect an option: \n1. (Re)Roll \n2. Edit \n3. Save \n4. Cancel" << std::endl;
                 int rollchoice;
                 std::cin >> rollchoice;
                 std::cin.clear();
 
                 /* Rollup adventurer's stats */
                 if (rollchoice == 1) {
+                    
+                    // Roll basic stats
+                    for (int i=0; i<6; i++) {
 
-                    for (int i=0; i<7; i++) {
-
-                        newstats[i] = roll_nd6(3);
+                        newstats[i] = roll_ndx(3, 6);
                     }
 
-                    /* Multiply adventurer's gold */
-                    newstats[6] *= 10;
-
+                    // Roll gold
+                    newstats[7] = roll_ndx(3, 6) * 10;
                     bonuses = true;
-                    modified = true;
 
                 /* Edit stats */
                 } else if (rollchoice == 2) {
@@ -255,13 +258,13 @@ int main() {
                         // Show user options and get input
                         std::cout << "\nEdit which stat?: " << std::endl;
                         showStats(newstats, false, true);
-                        std::cout << "7. Gold: " << newstats[6] << "\n\n8. Done!" << std::endl;
+                        std::cout << "\n9. Done!" << std::endl;
                         int editchoice;
                         std::cin >> editchoice;
                         std::cin.clear();
 
-                        // Edit stats 1-7
-                        if (editchoice > 0 && editchoice < 8) {
+                        // Edit stats 1-8
+                        if (editchoice > 0 && editchoice < 9) {
 
                             std::cout << "\nEnter a new value for your " << statnames[editchoice-1] << ":" << std::endl;
                             int newvalue;
@@ -270,11 +273,10 @@ int main() {
 
                             // Set new stat value
                             newstats[editchoice-1] = newvalue;
-                            modified = true;
                         }
 
                         // Done editing
-                        if (editchoice == 8) {
+                        if (editchoice == 9) {
                             edit = false;
                         }
                     }
@@ -282,15 +284,15 @@ int main() {
                 /* Save stats */
                 } else if (rollchoice == 3) {
 
-                    for (int i=0; i<7; i++) {
+                    for (int i=0; i<8; i++) {
                         adventurer.stats[i] = newstats[i];
                     }
 
-                    rolling = false;
+                    statting = false;
 
                 } else if (rollchoice == 4) {
 
-                    rolling = false;
+                    statting = false;
                 }
             }
 
